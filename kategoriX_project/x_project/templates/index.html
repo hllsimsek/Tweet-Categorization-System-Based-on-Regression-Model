@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tweet Kategori Menüsü</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Animate.css for animations -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --siyaset-color: #d32f2f;
+            --saglik-color: #43a047;
+            --spor-color: #fb8c00;
+            --teknoloji-color: #3949ab;
+            --yasam-color: #912fd3;
+            --gradient-bg: linear-gradient(135deg, #6b46c1 0%, #3730a3 100%);
+        }
+
+        body {
+            /* Modern gradient arka plan değişikliği */
+            background-image: linear-gradient(to right, #434343 0%, #000000 100%);
+            background-image: linear-gradient(to top, #09203f 0%, #537895 100%);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .container {
+            max-width: 900px;
+            padding: 20px;
+        }
+
+        .main-title {
+            position: relative;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 1px;
+            font-weight: 700;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .main-title::after {
+            content: '';
+            position: absolute;
+            width: 0%;
+            height: 4px;
+            background: var(--siyaset-color);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 4px;
+            animation: moveGradient 8s infinite alternate, changeColor 16s infinite;
+        }
+
+        @keyframes moveGradient {
+            0% {
+                width: 0%;
+                left: 0;
+                transform: translateX(0);
+            }
+            50% {
+                width: 100%;
+            }
+            100% {
+                width: 0%;
+                left: 100%;
+                transform: translateX(-100%);
+            }
+        }
+
+        @keyframes changeColor {
+            0%, 100% { background-color: var(--siyaset-color); }
+            33.33% { background-color: var(--saglik-color); }
+            66.66% { background-color: var(--spor-color); }
+            100% { background-color: var(--teknoloji-color); }
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.18), 0 6px 10px rgba(0,0,0,0.12);
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .category-menu-container {
+            background: var(--gradient-bg);
+            border-radius: 15px;
+            padding: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 16px rgba(107, 70, 193, 0.3);
+            /* Increased width to fit all menu items */
+            width: 100%;
+        }
+
+        .category-menu {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 10px 5px;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            display: flex;
+            /* Changed to space-around to distribute buttons evenly */
+            justify-content: center;
+        }
+
+        .category-menu::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-btn {
+            border-radius: 50px;
+            padding: 12px 24px;
+            margin: 0 8px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            white-space: nowrap;
+            color: white;
+            background-color: rgba(255, 255, 255, 0.15);
+            min-width: 130px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .category-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: -1;
+            transform: scale(0);
+            transition: all 0.4s;
+            border-radius: 50px;
+        }
+
+        .category-btn:hover::before {
+            transform: scale(1);
+        }
+
+        .category-btn.active {
+            background-color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.25), 0 3px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .category-btn.active[data-category="siyaset"] { color: var(--siyaset-color); }
+        .category-btn.active[data-category="saglik"] { color: var(--saglik-color); }
+        .category-btn.active[data-category="spor"] { color: var(--spor-color); }
+        .category-btn.active[data-category="teknoloji"] { color: var(--teknoloji-color); }
+        .category-btn.active[data-category="yasam"] { color: var(--yasam-color); }
+        .tweet-container {
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .category-title {
+            font-weight: 700;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap:8px;
+        }
+
+        .category-title-siyaset { color: var(--siyaset-color); border-bottom: 3px solid var(--siyaset-color); }
+        .category-title-saglik { color: var(--saglik-color); border-bottom: 3px solid var(--saglik-color); }
+        .category-title-spor { color: var(--spor-color); border-bottom: 3px solid var(--spor-color); }
+        .category-title-teknoloji { color: var(--teknoloji-color); border-bottom: 3px solid var(--teknoloji-color); }
+        .category-title-yasam { color: var(--yasam-color); border-bottom: 3px solid var(--yasam-color); }
+
+        .tweet-card {
+            border-radius: 12px;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: none;
+        }
+
+        .tweet-card::before {
+            content: '';
+            position: absolute;
+            width: 5px;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        .tweet-card-siyaset::before { background-color: var(--siyaset-color); }
+        .tweet-card-saglik::before { background-color: var(--saglik-color); }
+        .tweet-card-spor::before { background-color: var(--spor-color); }
+        .tweet-card-teknoloji::before { background-color: var(--teknoloji-color); }
+        .tweet-card-yasam::before { background-color: var(--yasam-color); }
+        .tweet-card:hover {
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .tweet-username {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .username-siyaset { color: var(--siyaset-color); }
+        .username-saglik { color: var(--saglik-color); }
+        .username-spor { color: var(--spor-color); }
+        .username-teknoloji { color: var(--teknoloji-color); }
+        .username-yasam { color: var(--yasam-color); }
+
+        .tweet-date {
+            font-size: 0.85rem;
+            color: #718096;
+            background-color: #EDF2F7;
+            padding: 3px 10px;
+            border-radius: 50px;
+        }
+
+        .tweet-content {
+            font-size: 1rem;
+        }
+
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 50px 0;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .double-bounce1, .double-bounce2 {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            opacity: 0.6;
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: sk-bounce 2.0s infinite ease-in-out;
+        }
+
+        .double-bounce1-siyaset, .double-bounce2-siyaset { background-color: var(--siyaset-color); }
+        .double-bounce1-saglik, .double-bounce2-saglik { background-color: var(--saglik-color); }
+        .double-bounce1-spor, .double-bounce2-spor { background-color: var(--spor-color); }
+        .double-bounce1-teknoloji, .double-bounce2-teknoloji { background-color: var(--teknoloji-color); }
+        .double-bounce1-yasam, .double-bounce2-yasam { background-color: var(--yasam-color); }
+        .double-bounce2 {
+            animation-delay: -1.0s;
+        }
+
+        @keyframes sk-bounce {
+            0%, 100% {
+                transform: scale(0.0);
+            } 50% {
+                transform: scale(1.0);
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #718096;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .empty-icon-siyaset { color: var(--siyaset-color); }
+        .empty-icon-saglik { color: var(--saglik-color); }
+        .empty-icon-spor { color: var(--spor-color); }
+        .empty-icon-teknoloji { color: var(--teknoloji-color); }
+        .empty-icon-yasam { color: var(--yasam-color); }
+
+        /* Pulse animation for buttons */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+            }
+        }
+
+        .category-btn.active {
+            animation: pulse 2s infinite;
+        }
+
+        /* Floating animation */
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Scrollable tweets container */
+        .tweets-scroll-container {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        /* Custom scrollbar for tweets */
+        .tweets-scroll-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .tweets-scroll-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .tweets-scroll-container::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+        }
+
+        /* Scrollbar colors based on category */
+        .scrollbar-siyaset::-webkit-scrollbar-thumb { background: var(--siyaset-color); }
+        .scrollbar-saglik::-webkit-scrollbar-thumb { background: var(--saglik-color); }
+        .scrollbar-spor::-webkit-scrollbar-thumb { background: var(--spor-color); }
+        .scrollbar-teknoloji::-webkit-scrollbar-thumb { background: var(--teknoloji-color); }
+        .scrollbar-yasam::-webkit-scrollbar-thumb { background: var(--yasam-color); }
+
+        .title-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 150px; /* istediğine göre ayarlanabilir */
+    text-align: center;
+}
+
+.text-animate {
+    position: relative;
+    font-weight: 700;
+    font-size: 3.0rem;
+    color: white; /* Sabit yazı rengi */
+    padding: 10px 20px;
+    z-index: 1;
+    overflow: hidden;
+}
+
+/* Parlak çizgi efekti */
+.text-animate::after {
+    content: "";
+    position: absolute;
+    top: 35%;                 /* yazının ortası */
+    left: -100%;
+    width: 300%;
+    height: 30%;              /* daha ince bir parıltı */
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: slideLight 4s linear infinite;  /* hızlandırılmış */
+    z-index: -1;
+}
+
+
+/* Yavaş kayan animasyon */
+@keyframes slideLight {
+    0%   { left: -100%; }
+    100% { left: 100%; }
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="main-title animate__animated animate__fadeInDown title-wrapper text-animate">KategoriX Platformu</h1>
+
+
+        <!-- Filtreleme Kontrolleri -->
+        <div class="filter-container mb-4 animate__animated animate__fadeInUp">
+            <div class="d-flex justify-content-center align-items-center gap-3">
+                <select id="sortSelect" class="form-select" style="width: auto; background-color: #59b8dd5c; color:white;;">
+                    <option value="date">Tarihe Göre</option>
+                    <option value="likes">Beğeni Sayısına Göre</option>
+                </select>
+                <select id="orderSelect" class="form-select" style="width: auto; background-color: #59b8dd5c; color:white;">
+                    <option value="desc">Azalan</option>
+                    <option value="asc">Artan</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Kategori Menüsü -->
+        <div class="category-menu-container animate__animated animate__fadeInUp">
+            <div class="category-menu">
+                <button class="category-btn active" data-category="siyaset">
+                    <i class="fas fa-landmark me-2"></i>Siyaset
+                </button>
+                <button class="category-btn" data-category="saglik">
+                    <i class="fas fa-heartbeat me-2"></i>Sağlık
+                </button>
+                <button class="category-btn" data-category="spor">
+                    <i class="fas fa-futbol me-2"></i>Spor
+                </button>
+                <button class="category-btn" data-category="teknoloji">
+                    <i class="fas fa-laptop-code me-2"></i>Teknoloji
+                </button>
+                <button class="category-btn" data-category="yasam">
+                    <i class="fas fa-heartbeat me-2"></i>Yaşam
+                </button>
+            </div>
+        </div>
+
+        <!-- Tweet Listesi -->
+        <div class="card tweet-container animate__animated animate__fadeIn">
+            <h2 class="category-title category-title-siyaset" id="category-title">
+                <i class="fas fa-landmark me-2" id="category-icon"></i>
+                <span id="selected-category">Siyaset</span> Tweetleri
+            </h2>
+
+            <!-- Loading state -->
+            <div id="loading" class="loading-container">
+                <div class="spinner">
+                    <div class="double-bounce1 double-bounce1-siyaset" id="spinner-1"></div>
+                    <div class="double-bounce2 double-bounce2-siyaset" id="spinner-2"></div>
+                </div>
+                <div>Tweetler yükleniyor...</div>
+            </div>
+
+            <!-- Tweets container with scroll -->
+            <div id="tweets-container" class="d-none tweets-scroll-container scrollbar-siyaset">
+                <!-- Tweets will be loaded here -->
+            </div>
+
+            <!-- Empty state -->
+            <div id="empty-state" class="empty-state d-none">
+                <i class="fas fa-search empty-icon empty-icon-siyaset" id="empty-icon"></i>
+                <h4>Bu kategoride henüz tweet bulunmuyor</h4>
+                <p>Daha sonra tekrar kontrol edebilirsiniz.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap & JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Kategoriler ve ikonları
+        const categoryIcons = {
+            'siyaset': 'fa-landmark',
+            'saglik': 'fa-heartbeat',
+            'spor': 'fa-futbol',
+            'teknoloji': 'fa-laptop-code',
+            'yasam': 'fa-heartbeat',
+        };
+
+        // Tweet verilerini backend'den al
+        async function fetchTweets(sortBy = 'date', order = 'desc') {
+            try {
+                const response = await fetch(`/api/tweets?sort=${sortBy}&order=${order}`);
+                if (!response.ok) {
+                    throw new Error('Tweet verisi alınamadı');
+                }
+                return await response.json();
+            } catch (error) {
+                console.error('Tweet yükleme hatası:', error);
+                return {};
+            }
+        }
+
+        // DOM elementleri
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        const tweetsContainer = document.getElementById('tweets-container');
+        const loadingElement = document.getElementById('loading');
+        const emptyStateElement = document.getElementById('empty-state');
+        const selectedCategoryElement = document.getElementById('selected-category');
+        const categoryIconElement = document.getElementById('category-icon');
+        const categoryTitleElement = document.getElementById('category-title');
+        const spinner1 = document.getElementById('spinner-1');
+        const spinner2 = document.getElementById('spinner-2');
+        const emptyIcon = document.getElementById('empty-icon');
+
+        // Seçili kategoriyi değiştirme fonksiyonu
+        function changeCategory(categoryId) {
+            // Aktif buton sınıfını güncelleme
+            categoryButtons.forEach(button => {
+                if (button.dataset.category === categoryId) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+
+            // Kategori başlığını güncelleme
+            const categoryName = document.querySelector(`.category-btn[data-category="${categoryId}"]`).textContent.trim();
+            selectedCategoryElement.textContent = categoryName;
+
+            // Kategori ikonunu güncelleme
+            categoryIconElement.className = `fas ${categoryIcons[categoryId]} me-2`;
+
+            // Başlık ve yükleme renklerini güncelleme
+            categoryTitleElement.className = `category-title category-title-${categoryId}`;
+            spinner1.className = `double-bounce1 double-bounce1-${categoryId}`;
+            spinner2.className = `double-bounce2 double-bounce2-${categoryId}`;
+            emptyIcon.className = `fas fa-search empty-icon empty-icon-${categoryId}`;
+
+            // Scrollbar rengini güncelleme için sınıfları temizle ve yeni sınıf ekle
+            tweetsContainer.className = `d-none tweets-scroll-container`;
+            tweetsContainer.classList.add(`scrollbar-${categoryId}`);
+
+            // Tweetleri yükleme
+            loadTweets(categoryId);
+        }
+
+        // Tweetleri yükleme fonksiyonu
+        function loadTweets(categoryId) {
+            // Yükleme durumunu gösterme
+            loadingElement.classList.remove('d-none');
+            tweetsContainer.classList.add('d-none');
+            emptyStateElement.classList.add('d-none');
+
+            // Backend'den tweet verilerini al
+            const sortBy = document.getElementById('sortSelect').value;
+            const order = document.getElementById('orderSelect').value;
+            fetchTweets(sortBy, order).then(tweetData => {
+                const tweets = tweetData[categoryId] || [];
+
+                if (tweets.length > 0) {
+                    renderTweets(tweets, categoryId);
+                    tweetsContainer.classList.remove('d-none');
+                    tweetsContainer.classList.add('animate__animated', 'animate__fadeIn');
+                    emptyStateElement.classList.add('d-none');
+                } else {
+                    tweetsContainer.classList.add('d-none');
+                    emptyStateElement.classList.remove('d-none');
+                    emptyStateElement.classList.add('animate__animated', 'animate__fadeIn');
+                }
+
+                loadingElement.classList.add('d-none');
+            }).catch(error => {
+                console.error('Tweet yükleme hatası:', error);
+                emptyStateElement.classList.remove('d-none');
+                emptyStateElement.querySelector('h4').textContent = 'Tweet verisi alınamadı';
+                emptyStateElement.querySelector('p').textContent = 'Lütfen daha sonra tekrar deneyin.';
+                loadingElement.classList.add('d-none');
+            });
+        }
+
+        // Tweetleri render etme fonksiyonu
+        function renderTweets(tweets, categoryId) {
+            tweetsContainer.innerHTML = '';
+
+            tweets.forEach((tweet, index) => {
+                const tweetCard = document.createElement('div');
+                tweetCard.className = `tweet-card tweet-card-${categoryId} p-4 animate__animated animate__fadeInUp`;
+                if (index < 5) {
+                    tweetCard.classList.add(`animate__delay-${index}s`);
+                }
+
+                                tweetCard.innerHTML = `
+                    <div class="tweet-content mt-2 mb-2">
+                        ${tweet.text}
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
+                        <span class="tweet-username username-${categoryId}"><i class="fas fa-user me-1"></i>${tweet.username || "Bilinmeyen Kullanıcı"}</span>
+                        <span class="tweet-date"><i class="fas fa-calendar-alt me-1"></i>${tweet.date || "Tarih yok"}</span>
+                        <span class="tweet-likes text-danger"><i class="fas fa-heart me-1"></i>${tweet.likes || 0} beğeni</span>
+                    </div>
+                `;
+
+
+                tweetsContainer.appendChild(tweetCard);
+            });
+        }
+
+        // Animasyon sınıfı eklemek için yardımcı fonksiyon
+        function addFloatingAnimation() {
+            const randomIndex = Math.floor(Math.random() * categoryButtons.length);
+            if (!categoryButtons[randomIndex].classList.contains('active')) {
+                categoryButtons[randomIndex].classList.add('float-animation');
+                setTimeout(() => {
+                    categoryButtons[randomIndex].classList.remove('float-animation');
+                }, 6000);
+            }
+        }
+
+        // Sayfa yüklendiğinde
+        document.addEventListener('DOMContentLoaded', function() {
+            // Kategori butonlarına tıklama eventi ekleme
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    changeCategory(button.dataset.category);
+                });
+            });
+
+            // Filtreleme seçeneklerine change event listener ekleme
+            document.getElementById('sortSelect').addEventListener('change', () => {
+                const currentCategory = document.querySelector('.category-btn.active').dataset.category;
+                changeCategory(currentCategory);
+            });
+
+            document.getElementById('orderSelect').addEventListener('change', () => {
+                const currentCategory = document.querySelector('.category-btn.active').dataset.category;
+                changeCategory(currentCategory);
+            });
+
+            // İlk kategorinin yüklenmesi
+            changeCategory('siyaset');
+
+            // Rastgele butonlar için animasyon ekleme
+            setInterval(addFloatingAnimation, 3000);
+        });
+
+        // Kategori menü konteynerinin genişliğini artırma
+        document.addEventListener('DOMContentLoaded', function() {
+            // Kategori menü konteynerini daha geniş yapma
+            const categoryMenuContainer = document.querySelector('.category-menu-container');
+            categoryMenuContainer.style.width = '100%';
+
+            // Kategori menüsünün butonlarını yeniden düzenleme
+            const categoryMenu = document.querySelector('.category-menu');
+            categoryMenu.style.justifyContent = 'space-around';
+            categoryMenu.style.flexWrap = 'nowrap';
+
+            // Tweet konteyneri için kaydırma çubuğu ayarları
+            const tweetsContainer = document.getElementById('tweets-container');
+            tweetsContainer.style.maxHeight = '500px';
+            tweetsContainer.style.overflowY = 'auto';
+            tweetsContainer.style.paddingRight = '5px';
+        });
+    </script>
+</body>
+</html>
