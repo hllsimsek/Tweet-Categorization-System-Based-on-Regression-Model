@@ -74,4 +74,5 @@ Model başarımını artırmak için:
 - Her kategoriye özel renk teması  
 - Akıcı kullanıcı arayüzü ve mobil uyumluluk
 
-### 🧠
+### 🧠 Proje Amacı
+Tweet içeriklerini karışık şekilde sunmak yerine ilgili başlıklar altında düzenleyerek, kullanıcı deneyimini filtreleme ve görsel iyileştirmelerle daha kullanışlı hale getirmeyi amaçlar.
